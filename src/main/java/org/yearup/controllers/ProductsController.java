@@ -45,9 +45,11 @@ public class ProductsController
     @GetMapping("{id}")
     @PreAuthorize("permitAll()")
     public Product getById(@PathVariable int id )
+            // path variable is what it is going ot be searching for
     {
         try
         {
+            //var is a data type that can mean anything (int, strings ect.)
             var product = productDao.getById(id);
 
             if(product == null)

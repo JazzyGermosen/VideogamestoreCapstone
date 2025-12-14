@@ -1,19 +1,17 @@
 package org.yearup.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.CategoryDao;
 import org.yearup.data.ProductDao;
 import org.yearup.models.Category;
 import org.yearup.models.Product;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import javax.sql.DataSource;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,55 +21,55 @@ import java.util.List;
 // add annotation to allow cross site origin requests
 
 @RestController
+// request mapping is the first thing that shows up in the url
+// also makes it so that we dont have to rewrite it through the rest of the code
+@RequestMapping("categories")
+// allows information from this controller to be accessed from another program.
+@CrossOrigin
 public class CategoriesController {
 
     private CategoryDao categoryDao;
     private ProductDao productDao;
 
+
     // create an Autowired controller to inject the categoryDao and ProductDao
     @Autowired
-    public void catcontroller(CategoryDao categoryDao, ProductDao productDao){
+    public CategoriesController(CategoryDao categoryDao, ProductDao productDao){
         this.categoryDao = categoryDao;
         this.productDao = productDao;
     }
 
     // add the appropriate annotation for a get action
-    @GetMapping("/categories")
-    public List<Category> getAll()
+    @GetMapping("")
+    @PreAuthorize("permitAll()")
+    public List<Category> getAll(
+            @RequestParam(name="cat", required = false)Integer categoryId,
+            @RequestParam(name="name", required = false)String name,
+            @RequestParam(name="description", required = false)String description
+    )
     {
         // find and return all categories
-        //creating a empty list to store objects in it
-        List<Category> categories = new ArrayList<>();
-
-        String sql = """
-                
-                Select
-                    categoryId
-                    name
-                    description
-                From
-                    categories;           
-                """;
-
-        try(
-                Connection conn = ;
-                Statement statement = conn.createStatement();
-                ResultSet resultSet = statement.executeQuery();
-                ){
-
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-
-        return categoryDao.getAllCategories();
+      try{
+          return categoryDao.getAllCategories();
+      }catch (Exception ex){
+          throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+      }
     }
 
     // add the appropriate annotation for a get action
-    @GetMapping("/categories/{id}")
+    @GetMapping("{id}")
+    @PreAuthorize("permitAll()")
     public Category getById(@PathVariable int id)
     {
         // get the category by id
-        return categoryDao.getById(id);
+        try{
+            Category category = categoryDao.getById(id);
+            if(category == null)
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            return category;
+        } catch(Exception ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
     }
 
     // the url to return all products in category 1 would look like this

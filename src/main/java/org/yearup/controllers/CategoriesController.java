@@ -74,33 +74,65 @@ public class CategoriesController {
 
     // the url to return all products in category 1 would look like this
     // https://localhost:8080/categories/1/products
-    @GetMapping("{categoryId}/products")
+    @GetMapping("{categoryId}/1/products")
     public List<Product> getProductsById(@PathVariable int categoryId)
     {
         // get a list of product by categoryId
-        return productDao.getById(categoryId);
+        // i feel like this required a new list to be instantiated here but im not entirely sure
+
+        try {
+            return getProductsById(categoryId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // add annotation to call this method for a POST action
     // add annotation to ensure that only an ADMIN can call this function
+    @PostMapping("")
+    @PreAuthorize("hasRole(ROLE_ADMIN)")
     public Category addCategory(@RequestBody Category category)
     {
         // insert the category
-        return null;
+
+        try{
+            return categoryDao.create(category);
+        }catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
     }
 
     // add annotation to call this method for a PUT (update) action - the url path must include the categoryId
     // add annotation to ensure that only an ADMIN can call this function
+    @PutMapping("{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void updateCategory(@PathVariable int id, @RequestBody Category category)
     {
         // update the category by id
+        try{
+            categoryDao.create(category);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
     }
 
 
     // add annotation to call this method for a DELETE action - the url path must include the categoryId
     // add annotation to ensure that only an ADMIN can call this function
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteCategory(@PathVariable int id)
     {
         // delete the category by id
+        try{
+
+            Category category = categoryDao.getById(id);
+            if (category == null)
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+            productDao.delete(id);
+        }catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
     }
 }

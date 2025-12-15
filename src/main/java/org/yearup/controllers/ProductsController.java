@@ -89,6 +89,8 @@ public class ProductsController
         {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
+
+
     }
 
     @DeleteMapping("{id}")

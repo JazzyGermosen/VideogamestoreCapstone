@@ -42,11 +42,7 @@ public class CategoriesController {
     // add the appropriate annotation for a get action
     @GetMapping("")
     @PreAuthorize("permitAll()")
-    public List<Category> getAll(
-            @RequestParam(name="cat", required = false)Integer categoryId,
-            @RequestParam(name="name", required = false)String name,
-            @RequestParam(name="description", required = false)String description
-    )
+    public List<Category> getAll()
     {
         // find and return all categories
       try{
@@ -74,14 +70,18 @@ public class CategoriesController {
 
     // the url to return all products in category 1 would look like this
     // https://localhost:8080/categories/1/products
-    @GetMapping("{categoryId}/1/products")
+    @GetMapping("{categoryId}")
     public List<Product> getProductsById(@PathVariable int categoryId)
     {
         // get a list of product by categoryId
         // i feel like this required a new list to be instantiated here but im not entirely sure
 
         try {
-            return getProductsById(categoryId);
+            List<Product> products = productDao.listByCategoryId(categoryId);
+            if (products == null)
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+            return products;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

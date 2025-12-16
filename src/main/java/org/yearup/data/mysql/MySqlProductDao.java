@@ -21,6 +21,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     @Override
     public List<Product> search(Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice, String subCategory)
     {
+
         List<Product> products = new ArrayList<>();
 
         String sql = "SELECT * FROM products " +

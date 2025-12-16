@@ -110,7 +110,7 @@ public class CategoriesController {
     {
         // update the category by id
         try{
-            categoryDao.create(category);
+            categoryDao.update(id, category);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }

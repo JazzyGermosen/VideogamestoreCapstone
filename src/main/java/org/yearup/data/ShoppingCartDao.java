@@ -10,9 +10,9 @@ public interface ShoppingCartDao
     ShoppingCart getByUserId(int userId);
     // add additional method signatures here
 
-    void addItemShoppingCart(int userId, ShoppingCartItem item);
-    void updateItemShoppingCart(int userId, int item);
+    void addItemShoppingCart(int userId, int productId);
+    void updateItemShoppingCart(int userId, int item, int quantity);
     void deleteShoppingCart(int userId);
-    BigDecimal getShoppingCartTotal(ShoppingCart shoppingCart);
+
 
 }

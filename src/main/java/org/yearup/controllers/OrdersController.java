@@ -33,6 +33,11 @@ public class OrdersController {
 
     // creating autowired constructor
     @Autowired
+    public OrdersController(ShoppingCartDao shoppingCartDao, UserDao userDao, OrderDao orderDao) {
+        this.shoppingCartDao = shoppingCartDao;
+        this.userDao = userDao;
+        this.orderDao = orderDao;
+    }
 
 
 

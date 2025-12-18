@@ -37,13 +37,14 @@ public class ProfileController {
 
         try
         {
+
             String userName = principal.getName();
 
             User user = userDao.getByUserName(userName);
 
             int userId = user.getId();
 
-            return ProfileDao.get
+            return ProfileDao.get(userId);
         }
         catch(Exception e)
         {

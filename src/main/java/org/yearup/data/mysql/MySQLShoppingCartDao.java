@@ -1,6 +1,7 @@
 package org.yearup.data.mysql;
 
 import org.yearup.data.ShoppingCartDao;
+import org.yearup.models.Product;
 import org.yearup.models.ShoppingCart;
 import org.yearup.models.ShoppingCartItem;
 
@@ -16,7 +17,22 @@ public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
 
     @Override
     public ShoppingCart getByUserId(int userId) {
-        String sql =
+        // instatiating shopping cart
+        ShoppingCart cart = new ShoppingCart();
+
+        String sql = """
+                Select
+                    user_id,
+                    S.product_id,
+                    quantity,
+                    P.*
+                From
+                    shopping_cart S
+                Join
+                    products P On (P.product_id = S.product_ID)    
+                Where
+                    user_id = ?
+                """;
 
 
         try (Connection conn = getConnection()) {
@@ -24,30 +40,55 @@ public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
             ResultSet resultSet = preparedStatement.executeQuery();
 
             //setting values to be entered into the (?????)
+            preparedStatement.setInt(1, userId);
 
+            while(resultSet.next()){
+                Product product = new Product();
+                int quantity = resultSet.getInt("quantity");
+                product.setProductId(resultSet.getInt("product_id"));
+                product.setName(resultSet.getString("name"));
+                product.setPrice(resultSet.getBigDecimal("price"));
+                product.setCategoryId(resultSet.getInt("category_id"));
+                product.setDescription(resultSet.getString("description"));
+                product.setSubCategory(resultSet.getString("subcategory"));
+                product.setStock(resultSet.getInt("stock"));
+                product.setFeatured(resultSet.getBoolean("featured"));
+                product.setImageUrl(resultSet.getString("image_url"));
 
+                ShoppingCartItem item = new ShoppingCartItem();
 
+                cart.add(item);
 
+            }
         } catch (SQLException e) {
             // throw error if doesnt work
             System.out.println("An error occured in the checkout phase");
             throw new RuntimeException(e);
         }
 
-        return null;
+        return cart;
     }
 
 
     @Override
-    public void addItemShoppingCart(int userId, ShoppingCartItem item) {
-        String sql =
+    public void addItemShoppingCart(int userId, int productId) {
+
+        String sql = """
+                Insert Into
+                    shopping_cart(user_id, product_id, quantity)
+                values
+                    (?, ?, 1)
+                ON DUPLICATE KEY UPDATE 
+                    quantity = quantity + 1
+                """;
+
         try (Connection conn = getConnection()) {
             PreparedStatement preparedStatement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             //setting values to be entered into the (?????)
-
-
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setInt(2, productId);
 
         } catch (SQLException e) {
             // throw error if doesnt work
@@ -57,19 +98,33 @@ public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     }
 
     @Override
-    public void updateItemShoppingCart(int userId, int item) {
-        String sql =
+    public void updateItemShoppingCart(int userId, int productId, int quantity) {
+
+        String sql = """
+                Update
+                    shopping_cart
+                Set
+                    quantity = ?
+                Where
+                    user_id = ?
+                    and product_id = ?
+                    and quantity >= 1
+                """;
+
         try (Connection conn = getConnection()) {
             PreparedStatement preparedStatement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             //setting values to be entered into the (?????)
+            preparedStatement.setInt(1, quantity);
+            preparedStatement.setInt(2, userId);
+            preparedStatement.setInt(3, productId);
 
 
 
         } catch (SQLException e) {
             // throw error if doesnt work
-            System.out.println("An error occured in the checkout phase");
+            System.out.println("An error occured in when updating an item");
             throw new RuntimeException(e);
         }
 
@@ -77,40 +132,26 @@ public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
 
     @Override
     public void deleteShoppingCart(int userId) {
-        String sql =
+        String sql = """
+                Delete From
+                    shopping_cart
+                Where
+                    user_id = ?
+                """;
 
 
         try (Connection conn = getConnection()) {
             PreparedStatement preparedStatement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            ResultSet resultSet = preparedStatement.executeQuery();
 
-
-
+            preparedStatement.setInt(1, userId);
+            preparedStatement.executeQuery();
 
         } catch (SQLException e) {
             // throw error if doesnt work
-            System.out.println("An error occured in the checkout phase");
+            System.out.println("An error when deleting item");
             throw new RuntimeException(e);
         }
     }
 
-    @Override
-    public BigDecimal getShoppingCartTotal(ShoppingCart shoppingCart) {
-        String sql =
 
-
-        try (Connection conn = getConnection()) {
-            PreparedStatement preparedStatement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-
-
-
-        } catch (SQLException e) {
-            // throw error if doesnt work
-            System.out.println("An error occured in the checkout phase");
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
 }

@@ -67,7 +67,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
                 Where
                     user_id = ?
                 
-                """
+                """;
 
         try(Connection connection = getConnection())
         {

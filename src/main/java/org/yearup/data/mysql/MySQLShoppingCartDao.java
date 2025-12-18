@@ -1,5 +1,7 @@
 package org.yearup.data.mysql;
 
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.yearup.data.ShoppingCartDao;
 import org.yearup.models.Product;
 import org.yearup.models.ShoppingCart;
@@ -8,8 +10,10 @@ import org.yearup.models.ShoppingCartItem;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
-
+@Component
+@Repository
 public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao {
+
 
     public MySQLShoppingCartDao(DataSource dataSource) {
         super(dataSource);
@@ -36,11 +40,11 @@ public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
 
 
         try (Connection conn = getConnection()) {
-            PreparedStatement preparedStatement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             //setting values to be entered into the (?????)
-            preparedStatement.setInt(1, userId);
 
             while(resultSet.next()){
                 Product product = new Product();
@@ -56,7 +60,9 @@ public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
                 product.setImageUrl(resultSet.getString("image_url"));
 
                 ShoppingCartItem item = new ShoppingCartItem();
-
+                // was not updating the item before adding it to the cart
+                item.setProduct(product);
+                item.setQuantity(quantity);
                 cart.add(item);
 
             }
@@ -83,12 +89,12 @@ public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
                 """;
 
         try (Connection conn = getConnection()) {
-            PreparedStatement preparedStatement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            ResultSet resultSet = preparedStatement.executeQuery();
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
             //setting values to be entered into the (?????)
             preparedStatement.setInt(1, userId);
             preparedStatement.setInt(2, productId);
+            preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
             // throw error if doesnt work
@@ -112,14 +118,14 @@ public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
                 """;
 
         try (Connection conn = getConnection()) {
-            PreparedStatement preparedStatement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            ResultSet resultSet = preparedStatement.executeQuery();
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
             //setting values to be entered into the (?????)
             preparedStatement.setInt(1, quantity);
             preparedStatement.setInt(2, userId);
             preparedStatement.setInt(3, productId);
 
+            preparedStatement.executeUpdate();
 
 
         } catch (SQLException e) {
@@ -141,10 +147,10 @@ public class MySQLShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
 
 
         try (Connection conn = getConnection()) {
-            PreparedStatement preparedStatement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
             preparedStatement.setInt(1, userId);
-            preparedStatement.executeQuery();
+            preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
             // throw error if doesnt work

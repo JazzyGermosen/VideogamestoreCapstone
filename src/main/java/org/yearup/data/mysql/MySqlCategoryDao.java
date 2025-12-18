@@ -27,8 +27,8 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
         String sql = """
                 
                 Select
-                    category_Id
-                    name
+                    category_id,
+                    name,
                     description
                 From
                     categories;
@@ -39,12 +39,12 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
                 Connection conn = getConnection();
                 PreparedStatement statement = conn.prepareStatement(sql);
         ) {
-            ResultSet resultSet = statement.executeQuery(sql);
+            ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
                 Category category = new Category();
 
-                category.setCategoryId(resultSet.getInt("category_Id"));
+                category.setCategoryId(resultSet.getInt("category_id"));
                 category.setName(resultSet.getString("name"));
                 category.setDescription(resultSet.getString("description"));
 
@@ -65,13 +65,13 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
         // storing the sql query in a variable
         String sql = """
                 Select
-                    category_Id,
+                    category_id,
                     name,
                     description
                 From
                     categories
                 Where
-                    category_id = ?
+                    category_id = ?;
                 
                 """;
         // doing try catch block with connection, prepared statement and result set
@@ -100,14 +100,13 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
 
         String sql = """
                 Insert Into
-                    categories(category_id, name, description)
+                    categories(name, description)
                 Values
-                    (?, ?, ?);
+                    (?, ?);
                 """;
 
         try(Connection conn = getConnection()){
             PreparedStatement statement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, category.getCategoryId());
             statement.setString(2, category.getName());
             statement.setString(3, category.getDescription());
 
@@ -133,18 +132,17 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
                 Update
                     categories
                 Set
-                    category_Id = ?
-                    name = ?
+                    name = ?,
                     description = ?
                 Where
-                    category_Id = ?;
+                    category_id = ?;
                 """;
 
         try(Connection conn = getConnection()){
             PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setInt(1, category.getCategoryId());
-            statement.setString(2, category.getName());
-            statement.setString(3, category.getDescription());
+            statement.setString(1, category.getName());
+            statement.setString(2, category.getDescription());
+            statement.setInt(3, categoryId);
 
             statement.executeUpdate();
         }catch (SQLException e){
@@ -159,7 +157,7 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
                 Delete From
                     categories
                 Where
-                    category_Id = ?;
+                    category_id = ?;
                 
                 """;
 

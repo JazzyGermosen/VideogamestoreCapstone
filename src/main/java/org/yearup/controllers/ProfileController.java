@@ -44,7 +44,7 @@ public class ProfileController {
 
             int userId = user.getId();
 
-            return ProfileDao.get(userId);
+            return profileDao.getByUserId(userId);
         }
         catch(Exception e)
         {
@@ -52,8 +52,8 @@ public class ProfileController {
         }
     }
 
-    @PutMapping("")
-    public Profile getByUserId(Principal principal,@RequestBody Profile profile){
+    @PutMapping("{id}")
+    public Profile getByUserId(Principal principal,@PathVariable int id){
         try
         {
             String userName = principal.getName();
@@ -61,7 +61,7 @@ public class ProfileController {
             User user = userDao.getByUserName(userName);
 
             int userId = user.getId();
-            return ProfileDao.getByUserId(userId, profile);
+            return profileDao.getByUserId(userId);
         }
         catch(Exception e)
         {

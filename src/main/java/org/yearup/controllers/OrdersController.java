@@ -16,8 +16,13 @@ import org.yearup.data.UserDao;
 import org.yearup.models.Profile;
 import org.yearup.models.ShoppingCart;
 import org.yearup.models.User;
+import org.yearup.service.CheckOutService;
 
+import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @PreAuthorize("hasRole('USER', 'ADMIN')")
@@ -28,21 +33,24 @@ public class OrdersController {
     private ShoppingCartDao shoppingCartDao;
     private UserDao userDao;
     private OrderDao orderDao;
+    private CheckOutService checkOutService;
 
 
 
     // creating autowired constructor
     @Autowired
-    public OrdersController(ShoppingCartDao shoppingCartDao, UserDao userDao, OrderDao orderDao) {
+    public OrdersController(ShoppingCartDao shoppingCartDao, UserDao userDao, OrderDao orderDao, CheckOutService checkOutService) {
         this.shoppingCartDao = shoppingCartDao;
         this.userDao = userDao;
         this.orderDao = orderDao;
+        this.checkOutService = checkOutService;
     }
 
 
 
-    @PostMapping("")
-    public void checkOut(Principal principal, Profile profile){
+
+    @PostMapping("/checkout")
+    public Map<String, Object> checkOut(Principal principal){
         try
         {
             // getting the logged in info
@@ -51,19 +59,15 @@ public class OrdersController {
             // getting the user
             User user = userDao.getByUserName(userName);
 
-            int userId = user.getId();
+            BigDecimal total = checkOutService.checkOut(user.getId());
 
-            // getting the shopping cart
-            ShoppingCart cart = ShoppingCartDao.getByUserId(userId);
-            // creating a variable named save order to store the order created from order dao
-            // im assuming
-            OrderDao savedOrder = orderDao.createOrder(profile, cart);
+            // same as list but is pared with a key
+            Map<String, Object> outPut = new HashMap<>();
 
-            //creating an if statement for the order check out
-            if (cart.getItems().isEmpty()){
-                System.out.println("shopping cart is empty!");
+            outPut.put("total", total);
 
-            }
+            return outPut;
+
         }
         catch(Exception e)
         {

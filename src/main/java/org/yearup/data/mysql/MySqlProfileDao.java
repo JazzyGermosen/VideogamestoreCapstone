@@ -47,7 +47,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
     }
 
     @Override
-    public Profile getByUserId(Profile profile, int userId)
+    public Profile getByUserId(int userId)
     {
         //creating an instance of a profile to use in the sql query
         Profile profile1 = new Profile();
@@ -78,15 +78,15 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
             ResultSet resultSet = ps.executeQuery();
 
             if(resultSet.next()){
-                profile.setUserId(userId);
-                profile.setFirstName(resultSet.getString("first_name"));
-                profile.setLastName(resultSet.getString("last_name"));
-                profile.setPhone(resultSet.getString("phone"));
-                profile.setEmail(resultSet.getString("email"));
-                profile.setAddress(resultSet.getString("address"));
-                profile.setCity(resultSet.getString("city"));
-                profile.setState(resultSet.getString("state"));
-                profile.setZip(resultSet.getString("zip"));
+                profile1.setUserId(userId);
+                profile1.setFirstName(resultSet.getString("first_name"));
+                profile1.setLastName(resultSet.getString("last_name"));
+                profile1.setPhone(resultSet.getString("phone"));
+                profile1.setEmail(resultSet.getString("email"));
+                profile1.setAddress(resultSet.getString("address"));
+                profile1.setCity(resultSet.getString("city"));
+                profile1.setState(resultSet.getString("state"));
+                profile1.setZip(resultSet.getString("zip"));
             } else{
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             }

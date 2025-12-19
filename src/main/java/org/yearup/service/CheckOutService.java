@@ -33,12 +33,14 @@ public class CheckOutService {
     public BigDecimal checkOut(int userId){
         ShoppingCart cart = shoppingCartDao.getByUserId(userId);
         Profile profile = profileDao.getByUserId(userId);
+
         int orderId = orderDao.createOrder(profile, cart);
         // cycling through the cart items
         cart.getItems().values().forEach(item -> {
             orderDao.updateStock(item.getProductId(), item.getQuantity());
             orderDao.orderLineItem(orderId, item);
         });
+
         shoppingCartDao.deleteShoppingCart(userId);
         return cart.getTotal();
     }

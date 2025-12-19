@@ -23,7 +23,6 @@ public class MyOrderSqlDao extends MySqlDaoBase implements OrderDao {
     public int createOrder(Profile profile, ShoppingCart cart) {
         // get total price of shopping cart items for our order to check out
         BigDecimal total = cart.getTotal();
-
         // getting the local date time
         LocalDateTime currentDate = LocalDateTime.now();
         // setting sql  query in a variable to be used in prepared statement later
@@ -37,19 +36,26 @@ public class MyOrderSqlDao extends MySqlDaoBase implements OrderDao {
                     (?,?,?,?,?,?,?)
                 
                 """;
-        try (Connection conn = getConnection()) {
-            PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        try (Connection conn = getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
 
             //setting values to be entered into the (?????)
             preparedStatement.setInt(1, profile.getUserId());
-            preparedStatement.setDate(2, Date.valueOf(String.valueOf(currentDate)));
+
+            preparedStatement.setString(2, "now()");
+
             preparedStatement.setString(3, profile.getAddress());
+
             preparedStatement.setString(4, profile.getCity());
+
             preparedStatement.setString(5, profile.getState());
+
             preparedStatement.setString(6, profile.getZip());
+
             preparedStatement.setBigDecimal(7, total);
 
-           preparedStatement.executeQuery();
+           preparedStatement.executeUpdate();
 
 
            try(

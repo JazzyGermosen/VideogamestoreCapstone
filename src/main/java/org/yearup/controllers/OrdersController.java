@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.OrderDao;
 import org.yearup.data.ProfileDao;
@@ -49,7 +46,8 @@ public class OrdersController {
 
 
 
-    @PostMapping("/checkout")
+    @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public Map<String, Object> checkOut(Principal principal){
         try
         {
@@ -58,13 +56,15 @@ public class OrdersController {
 
             // getting the user
             User user = userDao.getByUserName(userName);
-
+            System.out.println("hiiii im daisy");
             BigDecimal total = checkOutService.checkOut(user.getId());
-
+            System.out.println("hiiiii im not daisy");
             // same as list but is pared with a key
             Map<String, Object> outPut = new HashMap<>();
 
             outPut.put("total", total);
+            //outPut.put("username", userName);
+
 
             return outPut;
 

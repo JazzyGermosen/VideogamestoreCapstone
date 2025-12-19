@@ -65,6 +65,7 @@ public class ShoppingCartController
     // adding a post method
     // request body annotation to tell that we are passing in a request
     @PostMapping("/products/{id}")
+    @PreAuthorize("isAuthenticated")
     public void addProduct(Principal principal, @PathVariable int id){
         try{
 

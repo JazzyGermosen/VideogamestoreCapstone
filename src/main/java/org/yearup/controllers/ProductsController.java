@@ -69,6 +69,9 @@ public class ProductsController
     {
         try
         {
+            Product prod = productDao.create(product);
+            if (prod == null)
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             return productDao.create(product);
         }
         catch(Exception ex)

@@ -22,18 +22,18 @@ public class ProfileController {
     // i am instatiating these objections just incase i might need them when creating the profile controller
     private UserDao userDao;
     private ProfileDao profileDao;
-    private Profile profile;
+
 
     //using auto wire so that Spring boot will be able to use it
     @Autowired
-    public ProfileController(UserDao userDao, ProfileDao profileDao, Profile profile) {
+    public ProfileController(UserDao userDao, ProfileDao profileDao) {
         this.userDao = userDao;
         this.profileDao = profileDao;
-        this.profile = profile;
+
     }
 
     @GetMapping("")
-    public Profile createProfile(Principal principal, Profile profile){
+    public Profile createProfile(Principal principal){
 
         try
         {
